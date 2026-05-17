@@ -1,4 +1,5 @@
 import youtokentome
+import sentencepiece as spm
 import codecs
 import os
 import torch
