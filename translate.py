@@ -1,6 +1,6 @@
 import torch
 import torch.nn.functional as F
-import youtokentome
+import sentencepiece as spm
 import math
 from constants import *
 
@@ -8,7 +8,7 @@ from constants import *
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # BPE Model
-bpe_model = youtokentome.BPE(model=f"{DATA_FOLDER}/bpe.model")
+bpe_model = spm.SentencePieceProcessor(model_file=f"{DATA_FOLDER}/bpe.model")
 
 # Transformer model
 checkpoint = torch.load(f"{DATA_FOLDER}/averaged_transformer_checkpoint.pth.tar")
@@ -33,14 +33,13 @@ def translate(source_sequence, beam_size=4, length_norm_coefficient=0.6):
         n_completed_hypotheses = min(k, 10)
 
         # Vocab size
-        vocab_size = bpe_model.vocab_size()
+        vocab_size = bpe_model.get_piece_size()
 
         # If the source sequence is a string, convert to a tensor of IDs
         if isinstance(source_sequence, str):
             encoder_sequences = bpe_model.encode(source_sequence,
-                                                 output_type=youtokentome.OutputType.ID,
-                                                 bos=False,
-                                                 eos=False)
+                                                 add_bos=False,
+                                                 add_eos=False)
             encoder_sequences = torch.LongTensor(encoder_sequences).unsqueeze(0)  # (1, source_sequence_length)
         else:
             encoder_sequences = source_sequence
@@ -52,7 +51,7 @@ def translate(source_sequence, beam_size=4, length_norm_coefficient=0.6):
                                           encoder_sequence_lengths=encoder_sequence_lengths)  # (1, source_sequence_length, n_embd)
 
         # Our hypothesis to begin with is just <BOS>
-        hypotheses = torch.LongTensor([[bpe_model.subword_to_id('<BOS>')]]).to(device)  # (1, 1)
+        hypotheses = torch.LongTensor([[bpe_model.bos_id()]]).to(device)  # (1, 1)
         hypotheses_lengths = torch.LongTensor([hypotheses.size(1)]).to(device)  # (1)
 
         # Tensor to store hypotheses' scores; now it's just 0
@@ -94,7 +93,7 @@ def translate(source_sequence, beam_size=4, length_norm_coefficient=0.6):
                                          dim=1)  # (k, step + 1)
 
             # Which of these new hypotheses are complete (reached <EOS>)?
-            complete = next_word_indices == bpe_model.subword_to_id('<EOS>')  # (k), bool
+            complete = next_word_indices == bpe_model.eos_id()  # (k), bool
 
             # Set aside completed hypotheses and their scores normalized by their lengths
             # For the length normalization formula, see
@@ -124,7 +123,7 @@ def translate(source_sequence, beam_size=4, length_norm_coefficient=0.6):
 
         # Decode the hypotheses
         all_hypotheses = list()
-        for i, h in enumerate(bpe_model.decode(completed_hypotheses, ignore_ids=[0, 2, 3])):
+        for i, h in enumerate([bpe_model.decode(ids) for ids in completed_hypotheses]):
             all_hypotheses.append({"hypothesis": h, "score": completed_hypotheses_scores[i]})
 
         # Find the best scoring completed hypothesis

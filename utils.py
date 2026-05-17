@@ -4,7 +4,6 @@ import wget
 import tarfile
 import shutil
 import codecs
-import youtokentome
 import sentencepiece as spm
 import math
 from tqdm import tqdm
@@ -117,11 +116,7 @@ def prepare_data(data_folder, euro_parl=True, common_crawl=True, news_commentary
     del english, german  # free some RAM
 
     # Perform BPE
-    print("\nLearning BPE...")
-    # breakpoint()
-    # youtokentome.BPE.train(data=os.path.join(data_folder, "train.ende"), vocab_size=37000,
-    #                        model=os.path.join(data_folder, "bpe.model"))
-    
+    print("\nLearning BPE...")    
     spm.SentencePieceTrainer.train(
         input=os.path.join(data_folder, "train.ende"),
         model_prefix=os.path.join(data_folder, 'bpe'),
@@ -132,7 +127,6 @@ def prepare_data(data_folder, euro_parl=True, common_crawl=True, news_commentary
 
     # Load BPE model
     print("\nLoading BPE model...")
-    #bpe_model = youtokentome.BPE(model=os.path.join(data_folder, "bpe.model"))
     bpe_model = spm.SentencePieceProcessor(model_file=os.path.join(data_folder, "bpe.model"))
 
     # Re-read English, German
@@ -146,8 +140,6 @@ def prepare_data(data_folder, euro_parl=True, common_crawl=True, news_commentary
     print("\nFiltering...")
     pairs = list()
     for en, de in tqdm(zip(english, german), total=len(english)):
-        # en_tok = bpe_model.encode(en, output_type=youtokentome.OutputType.ID)
-        # de_tok = bpe_model.encode(de, output_type=youtokentome.OutputType.ID)
         en_tok = bpe_model.encode(en, out_type=int)
         de_tok = bpe_model.encode(de, out_type=int)
 

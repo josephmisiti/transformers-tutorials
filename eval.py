@@ -3,7 +3,6 @@ import sacrebleu
 from translate import translate
 from tqdm import tqdm
 from dataloader import SequenceLoader
-import youtokentome
 import codecs
 import os
 
