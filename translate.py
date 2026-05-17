@@ -7,7 +7,7 @@ import math
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # BPE Model
-bpe_model = youtokentome.BPE(model="/media/ssd/transformer data/bpe.model")
+bpe_model = youtokentome.BPE(model="/root/data/bpe.model")
 
 # Transformer model
 checkpoint = torch.load("averaged_transformer_checkpoint.pth.tar")
@@ -48,7 +48,7 @@ def translate(source_sequence, beam_size=4, length_norm_coefficient=0.6):
 
         # Encode
         encoder_sequences = model.encoder(encoder_sequences=encoder_sequences,
-                                          encoder_sequence_lengths=encoder_sequence_lengths)  # (1, source_sequence_length, d_model)
+                                          encoder_sequence_lengths=encoder_sequence_lengths)  # (1, source_sequence_length, n_embd)
 
         # Our hypothesis to begin with is just <BOS>
         hypotheses = torch.LongTensor([[bpe_model.subword_to_id('<BOS>')]]).to(device)  # (1, 1)

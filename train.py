@@ -7,17 +7,17 @@ from dataloader import SequenceLoader
 from utils import *
 
 # Data parameters
-data_folder = '/media/ssd/transformer data'  # folder with data files
+data_folder = '/root/data'  # folder with data files
 
 # Model parameters
-d_model = 512  # size of vectors throughout the transformer model
-n_heads = 8  # number of heads in the multi-head attention
+n_embd = 512  # size of vectors throughout the transformer model
+n_head = 8  # number of heads in the multi-head attention
 d_queries = 64  # size of query vectors (and also the size of the key vectors) in the multi-head attention
 d_values = 64  # size of value vectors in the multi-head attention
 d_inner = 2048  # an intermediate size in the position-wise FC
-n_layers = 6  # number of layers in the Encoder and Decoder
+n_layer = 6  # number of layers in the Encoder and Decoder
 dropout = 0.1  # dropout probability
-positional_encoding = get_positional_encoding(d_model=d_model,
+positional_encoding = get_positional_encoding(n_embd=n_embd,
                                               max_length=160)  # positional encodings up to the maximum possible pad-length
 
 # Learning parameters
@@ -28,7 +28,7 @@ print_frequency = 20  # print status once every so many steps
 n_steps = 100000  # number of training steps
 warmup_steps = 8000  # number of warmup steps where learning rate is increased linearly; twice the value in the paper, as in the official transformer repo.
 step = 1  # the step number, start from 1 to prevent math error in the next line
-lr = get_lr(step=step, d_model=d_model,
+lr = get_lr(step=step, n_embd=n_embd,
             warmup_steps=warmup_steps)  # see utils.py for learning rate schedule; twice the schedule in the paper, as in the official transformer repo.
 start_epoch = 0  # start at this epoch
 betas = (0.9, 0.98)  # beta coefficients in the Adam optimizer
@@ -45,12 +45,12 @@ def main():
     global checkpoint, step, start_epoch, epoch, epochs
 
     # Initialize data-loaders
-    train_loader = SequenceLoader(data_folder="/media/ssd/transformer data",
+    train_loader = SequenceLoader(data_folder="/root/data",
                                   source_suffix="en",
                                   target_suffix="de",
                                   split="train",
                                   tokens_in_batch=tokens_in_batch)
-    val_loader = SequenceLoader(data_folder="/media/ssd/transformer data",
+    val_loader = SequenceLoader(data_folder="/root/data",
                                 source_suffix="en",
                                 target_suffix="de",
                                 split="val",
@@ -60,12 +60,12 @@ def main():
     if checkpoint is None:
         model = Transformer(vocab_size=train_loader.bpe_model.vocab_size(),
                             positional_encoding=positional_encoding,
-                            d_model=d_model,
-                            n_heads=n_heads,
+                            n_embd=n_embd,
+                            n_head=n_head,
                             d_queries=d_queries,
                             d_values=d_values,
                             d_inner=d_inner,
-                            n_layers=n_layers,
+                            n_layer=n_layer,
                             dropout=dropout)
         optimizer = torch.optim.Adam(params=[p for p in model.parameters() if p.requires_grad],
                                      lr=lr,
@@ -173,7 +173,7 @@ def train(train_loader, model, criterion, optimizer, epoch, step):
             step += 1
 
             # Update learning rate after each step
-            change_lr(optimizer, new_lr=get_lr(step=step, d_model=d_model, warmup_steps=warmup_steps))
+            change_lr(optimizer, new_lr=get_lr(step=step, n_embd=n_embd, warmup_steps=warmup_steps))
 
             # Time taken for this training step
             step_time.update(time.time() - start_step_time)

@@ -164,37 +164,37 @@ def prepare_data(data_folder, euro_parl=True, common_crawl=True, news_commentary
     print("\n...DONE!\n")
 
 
-def get_positional_encoding(d_model, max_length=100):
+def get_positional_encoding(n_embd, max_length=100):
     """
     Computes positional encoding as defined in the paper.
 
-    :param d_model: size of vectors throughout the transformer model
+    :param n_embd: size of vectors throughout the transformer model
     :param max_length: maximum sequence length up to which positional encodings must be calculated
-    :return: positional encoding, a tensor of size (1, max_length, d_model)
+    :return: positional encoding, a tensor of size (1, max_length, n_embd)
     """
-    positional_encoding = torch.zeros((max_length, d_model))  # (max_length, d_model)
+    positional_encoding = torch.zeros((max_length, n_embd))  # (max_length, n_embd)
     for i in range(max_length):
-        for j in range(d_model):
+        for j in range(n_embd):
             if j % 2 == 0:
-                positional_encoding[i, j] = math.sin(i / math.pow(10000, j / d_model))
+                positional_encoding[i, j] = math.sin(i / math.pow(10000, j / n_embd))
             else:
-                positional_encoding[i, j] = math.cos(i / math.pow(10000, (j - 1) / d_model))
+                positional_encoding[i, j] = math.cos(i / math.pow(10000, (j - 1) / n_embd))
 
-    positional_encoding = positional_encoding.unsqueeze(0)  # (1, max_length, d_model)
+    positional_encoding = positional_encoding.unsqueeze(0)  # (1, max_length, n_embd)
 
     return positional_encoding
 
 
-def get_lr(step, d_model, warmup_steps):
+def get_lr(step, n_embd, warmup_steps):
     """
     The LR schedule. This version below is twice the definition in the paper, as used in the official T2T repository.
 
     :param step: training step number
-    :param d_model: size of vectors throughout the transformer model
+    :param n_embd: size of vectors throughout the transformer model
     :param warmup_steps: number of warmup steps where learning rate is increased linearly; twice the value in the paper, as in the official T2T repo
     :return: updated learning rate
     """
-    lr = 2. * math.pow(d_model, -0.5) * min(math.pow(step, -0.5), step * math.pow(warmup_steps, -1.5))
+    lr = 2. * math.pow(n_embd, -0.5) * min(math.pow(step, -0.5), step * math.pow(warmup_steps, -1.5))
 
     return lr
 

@@ -1,8 +1,8 @@
 from utils import *
 
-download_data(data_folder="/media/ssd/transformer data")
+download_data(data_folder="/root/data")
 
-prepare_data(data_folder="/media/ssd/transformer data",
+prepare_data(data_folder="/root/data",
              euro_parl=True,
              common_crawl=True,
              news_commentary=True,
