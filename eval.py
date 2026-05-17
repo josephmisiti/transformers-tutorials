@@ -7,6 +7,8 @@ import youtokentome
 import codecs
 import os
 
+from constants import *
+
 # Use sacreBLEU in Python or in the command-line?
 # Using in Python will use the test data downloaded in prepare_data.py
 # Using in the command-line will use test data automatically downloaded by sacreBLEU...
@@ -16,7 +18,7 @@ sacrebleu_in_python = False
 # Make sure the right model checkpoint is selected in translate.py
 
 # Data loader
-test_loader = SequenceLoader(data_folder="/root/data",
+test_loader = SequenceLoader(data_folder=DATA_FOLDER,
                              source_suffix="en",
                              target_suffix="de",
                              split="test",

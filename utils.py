@@ -10,7 +10,6 @@ from tqdm import tqdm
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
 def download_data(data_folder):
     """
     Downloads the training, validation, and test files for WMT '14 en-de translation task.

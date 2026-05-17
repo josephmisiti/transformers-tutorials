@@ -5,9 +5,11 @@ import time
 from model import Transformer, LabelSmoothedCE
 from dataloader import SequenceLoader
 from utils import *
+from constants import *
+
 
 # Data parameters
-data_folder = '/root/data'  # folder with data files
+data_folder = DATA_FOLDER
 
 # Model parameters
 n_embd = 512  # size of vectors throughout the transformer model
@@ -45,12 +47,12 @@ def main():
     global checkpoint, step, start_epoch, epoch, epochs
 
     # Initialize data-loaders
-    train_loader = SequenceLoader(data_folder="/root/data",
+    train_loader = SequenceLoader(data_folder=DATA_FOLDER,
                                   source_suffix="en",
                                   target_suffix="de",
                                   split="train",
                                   tokens_in_batch=tokens_in_batch)
-    val_loader = SequenceLoader(data_folder="/root/data",
+    val_loader = SequenceLoader(data_folder=DATA_FOLDER,
                                 source_suffix="en",
                                 target_suffix="de",
                                 split="val",

@@ -2,15 +2,16 @@ import torch
 import torch.nn.functional as F
 import youtokentome
 import math
+from constants import *
 
 # Device
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # BPE Model
-bpe_model = youtokentome.BPE(model="/root/data/bpe.model")
+bpe_model = youtokentome.BPE(model=f"{DATA_FOLDER}/bpe.model")
 
 # Transformer model
-checkpoint = torch.load("averaged_transformer_checkpoint.pth.tar")
+checkpoint = torch.load(f"{DATA_FOLDER}/averaged_transformer_checkpoint.pth.tar")
 model = checkpoint['model'].to(device)
 model.eval()
 

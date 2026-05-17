@@ -1,8 +1,11 @@
 from utils import *
 
-download_data(data_folder="/root/data")
+from constants import *
 
-prepare_data(data_folder="/root/data",
+
+download_data(data_folder=DATA_FOLDER)
+
+prepare_data(data_folder=DATA_FOLDER,
              euro_parl=True,
              common_crawl=True,
              news_commentary=True,
